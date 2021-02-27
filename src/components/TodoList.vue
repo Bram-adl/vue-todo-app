@@ -11,38 +11,14 @@
       enter-active-class="animate__animated animate__fadeInUp" 
       leave-active-class="animate__animated animate__fadeOutDown"
     >
-      <div 
-        class="todo-item"
+      <TodoItem 
         v-for="(todo, index) in todosFiltered"
         :key="todo.id"
-      >
-        <div class="todo-item-left">
-          <input type="checkbox" v-model="todo.completed">
-          
-          <div 
-            class="todo-item-label" 
-            :class="{ completed: todo.completed }" 
-            v-if="!todo.editing" 
-            @dblclick="editTodo(todo)"
-          >
-            {{ todo.title }}
-          </div>
-
-          <input 
-            type="text" 
-            v-model="todo.title" 
-            class="todo-item-edit" 
-            v-else
-            v-focus
-            @blur="doneEditTodo(todo)"
-            @keyup.enter="doneEditTodo(todo)"
-            @keyup.esc="cancelEditTodo(todo)">
-        </div>
-
-        <div class="todo-remove" @click="removeTodo(index)">
-          &times;
-        </div>
-      </div>
+        :todo="todo"
+        :index="index" 
+        :checkAll="!anyRemaining"
+        @removedTodo="removeTodo"
+        @finishedEditTodo="finishEditTodo" />
     </transition-group>
 
     <div class="extra-container">
@@ -100,15 +76,13 @@
 </template>
 
 <script>
+import TodoItem from './TodoItem';
+
 export default {
   name: 'TodoList',
 
-  directives: {
-    focus: {
-      inserted: function (el) {
-        el.focus();
-      },
-    },
+  components: {
+    TodoItem,
   },
 
   data: function () {
@@ -131,8 +105,6 @@ export default {
           editing: false,
         },
       ],
-
-      beforeEditCache: '',
 
       filter: 'all',
     };
@@ -178,23 +150,8 @@ export default {
       this.idForTodo++;
     },
 
-    editTodo: function (todo) {
-      this.beforeEditCache = todo.title;
-      todo.editing = true;
-    },
-
-    doneEditTodo: function (todo) {
-      // Prevent user for inserting empty todo
-      if (!todo.title.trim().length) {
-        todo.title = this.beforeEditCache;
-      }
-      
-      todo.editing = false;
-    },
-
-    cancelEditTodo: function (todo) {
-      todo.title = this.beforeEditCache;
-      todo.editing = false;
+    finishEditTodo: function ({index, todo}) {
+      this.todos.splice(index, 1, todo);
     },
 
     removeTodo: function (index) {
@@ -224,58 +181,6 @@ export default {
   &:focus {
     outline: none;
   }
-}
-
-.todo-item {
-  margin-bottom: 12px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  animation-duration: 0.3s;
-}
-
-.todo-remove {
-  cursor: pointer;
-  margin-left: 14px;
-
-  &:hover {
-    color: #000;
-  }
-}
-
-.todo-item-left {
-  display: flex;
-  align-items: center;
-}
-
-.todo-item-label {
-  padding: 10px;
-  margin-left: 12px;
-
-  border: 1px solid white;
-}
-
-.todo-item-edit {
-  width: 100%;
-
-  padding: 10px;
-  margin-left: 12px;
-  border: 1px solid #ccc;
-
-  color: #2c3e50;
-  font-size: 24px;
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-
-  &:focus {
-    outline: none;
-  }
-}
-
-.completed {
-  text-decoration: line-through;
-  color: grey;
 }
 
 .extra-container {
