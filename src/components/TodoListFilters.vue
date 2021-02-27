@@ -27,16 +27,15 @@
 export default {
   name: 'TodoListFilters',
 
-  data: function () {
-    return {
-      filter: 'all',
-    };
+  computed: {
+    filter: function () {
+      return this.$store.state.filter;
+    },
   },
 
   methods: {
     changeFilter: function (filter) {
-      this.filter = filter;
-      this.eventBus.$emit('changedFilter', this.filter);
+      this.$store.dispatch('changeFilter', filter);
     }
   }
 }

@@ -42,4 +42,48 @@ export default {
   margin: 20px auto;
   height: 75px;
 }
+
+.extra-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-top: 14px;
+  margin-bottom: 14px;
+  border-top: 1px solid lightgrey;
+
+  font-size: 16px;
+}
+
+button {
+  font-size: 14px;
+
+  background-color: white;
+  border: 1px solid lightgrey;
+
+  margin-right: 2px;
+  appearance: none;
+
+  &:hover {
+    background: lightgreen;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.active {
+  background: lightgreen;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .2s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

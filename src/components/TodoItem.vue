@@ -33,7 +33,7 @@
           Plural
         </button>
         
-        <span class="todo-remove" @click="removeTodo(index)">
+        <span class="todo-remove" @click="removeTodo">
           &times;
         </span>
       </div>
@@ -47,11 +47,6 @@ export default {
   props: {
     todo: {
       type: Object,
-      required: true,
-    },
-
-    index: {
-      type: Number,
       required: true,
     },
 
@@ -81,7 +76,7 @@ export default {
 
   watch: {
     checkAll() {
-      this.completed = this.checkAll ? true : false;
+      this.completed = this.checkAll ? true : this.todo.completed;
     },
   },
 
@@ -92,21 +87,17 @@ export default {
     },
 
     finishEditTodo: function () {
-      // Prevent user for inserting empty todo
       if (!this.title.trim().length) {
         this.title = this.beforeEditCache;
       }
       
       this.editing = false;
 
-      this.eventBus.$emit('finishedEditTodo', {
-        index: this.index,
-        todo: {
-          id: this.id,
-          title: this.title,
-          completed: this.completed,
-          editing: this.editing,
-        },
+      this.$store.dispatch('finishEditTodo', {
+        id: this.id,
+        title: this.title,
+        completed: this.completed,
+        editing: this.editing,
       });
     },
 
@@ -115,8 +106,8 @@ export default {
       this.editing = false;
     },
     
-    removeTodo: function (index) {
-      this.eventBus.$emit('removedTodo', index);
+    removeTodo: function () {
+      this.$store.dispatch('removeTodo', this.id);
     },
 
     pluralize: function () {
@@ -126,14 +117,12 @@ export default {
     handlePluralize: function () {
       this.title = this.title + 's';
 
-      this.eventBus.$emit('finishedEditTodo', {
-        index: this.index,
-        todo: {
-          id: this.id,
-          title: this.title,
-          completed: this.completed,
-          editing: this.editing,
-        },
+      const index = this.$store.state.todos.findIndex(todo => todo.id === this.id);
+      this.$store.state.todos.splice(index, 1, {
+        id: this.id,
+        title: this.title,
+        completed: this.completed,
+        editing: this.editing,
       });
     }
   }

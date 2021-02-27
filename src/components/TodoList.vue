@@ -12,17 +12,16 @@
       leave-active-class="animate__animated animate__fadeOutDown"
     >
       <TodoItem 
-        v-for="(todo, index) in todosFiltered"
+        v-for="(todo) in todosFiltered"
         :key="todo.id"
         :todo="todo"
-        :index="index" 
         :checkAll="!anyRemaining" />
     </transition-group>
 
     <div class="extra-container">
-      <TodoItemCheckAll :anyRemaining="anyRemaining" />
+      <TodoItemCheckAll />
 
-      <TodoItemRemaining :remaining="remaining" />
+      <TodoItemRemaining />
     </div>
 
     <div class="extra-container">
@@ -30,7 +29,7 @@
 
       <div>
         <transition name="fade">
-          <TodoListClear :showClearCompletedButton="showClearCompletedButton" />
+          <TodoListClear />
         </transition>
       </div>
     </div>
@@ -60,63 +59,24 @@ export default {
       newTodo: '',
       
       idForTodo: 3,
-      
-      todos: [
-        {
-          id: 1,
-          title: 'Learn VueJS',
-          completed: false,
-          editing: false,
-        },
-        {
-          id: 2,
-          title: 'Learn VueX',
-          completed: false,
-          editing: false,
-        },
-      ],
-
-      filter: 'all',
     };
-  },
-
-  created: function () {
-    this.eventBus.$on('removedTodo', (index) => this.removeTodo(index));
-    this.eventBus.$on('finishedEditTodo', (data) => this.finishEditTodo(data));
-    this.eventBus.$on('checkedAllTodos', (anyRemaining) => this.checkAllTodos(anyRemaining));
-    this.eventBus.$on('changedFilter', (filter) => this.filter = filter);
-    this.eventBus.$on('clearedCompletedTodos', () => this.clearCompletedTodos());
-  },
-
-  beforeDestroy: function () {
-    this.eventBus.$off('removedTodo', (index) => this.removeTodo(index));
-    this.eventBus.$off('finishedEditTodo', (data) => this.finishEditTodo(data));
-    this.eventBus.$off('checkedAllTodos', (anyRemaining) => this.checkAllTodos(anyRemaining));
-    this.eventBus.$off('changedFilter', (filter) => this.filter = filter);
-    this.eventBus.$off('clearedCompletedTodos', () => this.clearCompletedTodos());
   },
 
   computed: {
     remaining: function () {
-      return this.todos.filter(todo => !todo.completed).length;
+      return this.$store.getters.remaining;
     },
 
     anyRemaining: function () {
-      return this.remaining != 0;
+      return this.$store.getters.anyRemaining;
     },
 
     todosFiltered: function () {
-      if (this.filter == 'active') {
-        return this.todos.filter(todo => !todo.completed);
-      } else if (this.filter == 'completed') {
-        return this.todos.filter(todo => todo.completed);
-      }
-
-      return this.todos;
+      return this.$store.getters.todosFiltered;
     },
 
     showClearCompletedButton: function () {
-      return this.todos.filter(todo => todo.completed).length > 0;
+      return this.$store.getters.showClearCompletedButton;
     },
   },
 
@@ -125,7 +85,7 @@ export default {
       // Prevent user for inserting empty todo
       if (!this.newTodo.trim().length) return;
       
-      this.todos.push({
+      this.$store.dispatch('addTodo', {
         id: this.idForTodo,
         title: this.newTodo,
         completed: false,
@@ -134,23 +94,7 @@ export default {
 
       this.newTodo = '';
       this.idForTodo++;
-    },
-
-    finishEditTodo: function ({index, todo}) {
-      this.todos.splice(index, 1, todo);
-    },
-
-    removeTodo: function (index) {
-      this.todos.splice(index, 1);
-    },
-
-    checkAllTodos: function () {
-      this.todos.forEach(todo => todo.completed = event.target.checked);
-    },
-
-    clearCompletedTodos: function () {
-      this.todos = this.todos.filter(todo => !todo.completed);
-    },
+    }, 
   }
 }
 </script>
@@ -167,49 +111,5 @@ export default {
   &:focus {
     outline: none;
   }
-}
-
-.extra-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding-top: 14px;
-  margin-bottom: 14px;
-  border-top: 1px solid lightgrey;
-
-  font-size: 16px;
-}
-
-button {
-  font-size: 14px;
-
-  background-color: white;
-  border: 1px solid lightgrey;
-
-  margin-right: 2px;
-  appearance: none;
-
-  &:hover {
-    background: lightgreen;
-  }
-
-  &:focus {
-    outline: none;
-  }
-}
-
-.active {
-  background: lightgreen;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity .2s;
-}
-
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>

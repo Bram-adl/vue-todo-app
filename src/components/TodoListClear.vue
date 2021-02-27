@@ -11,16 +11,15 @@
 export default {
   name: 'TodoListClear',
 
-  props: {
-    showClearCompletedButton: {
-      type: Boolean,
-      required: true,
+  computed: {
+    showClearCompletedButton: function () {
+      return this.$store.getters.showClearCompletedButton;
     },
   },
 
   methods: {
     clearCompletedTodos: function () {
-      this.eventBus.$emit('clearedCompletedTodos');
+      this.$store.dispatch('clearCompletedTodos');
     }
   }
 }

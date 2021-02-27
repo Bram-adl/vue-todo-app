@@ -8,12 +8,11 @@
 export default {
   name: 'TodoItemRemaining',
 
-  props: {
-    remaining: {
-      type: Number,
-      required: true,
-    },
-  },
+  computed: {
+    remaining: function () {
+      return this.$store.getters.remaining;
+    }
+  }
 }
 </script>
 
