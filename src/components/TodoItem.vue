@@ -26,8 +26,16 @@
           @keyup.esc="cancelEditTodo">
       </div>
 
-      <div class="todo-remove" @click="removeTodo(index)">
-        &times;
+      <div>
+        <button
+          @click="pluralize"
+        >
+          Plural
+        </button>
+        
+        <span class="todo-remove" @click="removeTodo(index)">
+          &times;
+        </span>
       </div>
   </div>
 </template>
@@ -63,6 +71,14 @@ export default {
     };
   },
 
+  created: function () {
+    this.eventBus.$on('pluralized', this.handlePluralize);
+  },
+
+  beforeDestroy: function () {
+    this.eventBus.$off('pluralized', this.handlePluralize);
+  },
+
   watch: {
     checkAll() {
       this.completed = this.checkAll ? true : false;
@@ -83,7 +99,7 @@ export default {
       
       this.editing = false;
 
-      this.$emit('finishedEditTodo', {
+      this.eventBus.$emit('finishedEditTodo', {
         index: this.index,
         todo: {
           id: this.id,
@@ -100,7 +116,25 @@ export default {
     },
     
     removeTodo: function (index) {
-      this.$emit('removedTodo', index);
+      this.eventBus.$emit('removedTodo', index);
+    },
+
+    pluralize: function () {
+      this.eventBus.$emit('pluralized');
+    },
+
+    handlePluralize: function () {
+      this.title = this.title + 's';
+
+      this.eventBus.$emit('finishedEditTodo', {
+        index: this.index,
+        todo: {
+          id: this.id,
+          title: this.title,
+          completed: this.completed,
+          editing: this.editing,
+        },
+      });
     }
   }
 }

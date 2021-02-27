@@ -3,7 +3,10 @@ import App from './App.vue'
 
 import 'animate.css'
 
+Vue.prototype.eventBus = new Vue();
+
 Vue.config.productionTip = false
+
 Vue.directive('focus', {
   inserted: function (el) {
     el.focus();
