@@ -1,11 +1,12 @@
 import Vue from 'vue';
-import App from './App.vue';
+import Master from './layouts/Master.vue';
+
 import { store } from './store';
+import { router } from './router';
 
 import 'animate.css';
 
 Vue.prototype.eventBus = new Vue();
-
 Vue.config.productionTip = false;
 
 Vue.directive('focus', {
@@ -15,6 +16,7 @@ Vue.directive('focus', {
 });
 
 new Vue({
-  render: h => h(App),
+  render: h => h(Master),
   store,
+  router,
 }).$mount('#app');
