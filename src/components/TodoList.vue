@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="name-container">
+      Welcome, {{ name }}
+    </div>
+    
     <input 
       type="text" 
       class="todo-input" 
@@ -59,11 +63,17 @@ export default {
       newTodo: '',
       
       idForTodo: 3,
+
+      name: '',
     };
   },
 
   created: function () {
     this.$store.dispatch('getTodos');
+    this.$store.dispatch('getUser')
+      .then(response => {
+        this.name = response.data.name;
+      });
   },
 
   computed: {
@@ -95,6 +105,10 @@ export default {
 </script>
 
 <style lang="scss">
+.name-container {
+  margin-bottom: 16px;
+}
+
 .todo-input {
   width: 100%;
   

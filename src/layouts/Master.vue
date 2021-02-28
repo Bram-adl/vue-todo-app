@@ -19,7 +19,13 @@
     </ul>
 
     <div>
-      <router-view></router-view>
+      <transition 
+        enter-active-class="animate__animated animate__fadeIn animate__faster" 
+        leave-active-class="animate__animated animate__fadeOut animate__faster"
+        mode="out-in"
+      >
+        <router-view></router-view>
+      </transition>
     </div>
   </div>
 </template>
@@ -75,5 +81,14 @@ export default {
   letter-spacing: 0.1rem;
   text-decoration: none;
   text-transform: uppercase;
+}
+
+.server-error {
+  margin-bottom: 12px;
+  font-size: 16px;
+  padding: 10px 16px;
+  color: #a94442;
+  background: #f3dede;
+  border-radius: 4px;
 }
 </style>

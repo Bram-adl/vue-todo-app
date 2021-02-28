@@ -51,6 +51,10 @@ export const store = new VueX.Store({
     logout: function (state) {
       state.token = null;
     },
+
+    clearTodos: function (state) {
+      state.todos = [];
+    },
     
     getTodos: function (state, todos) {
       state.todos = todos;
@@ -96,7 +100,20 @@ export const store = new VueX.Store({
   },
 
   actions: {
-    login: function (context, credentials) {
+    getUser: function () {
+      return new Promise((resolve, reject) => {
+        axios.get('/user')
+        .then(response => {
+          resolve(response);
+        })
+        .catch(error => {
+          console.log(error);
+          reject(error);
+        });
+      });
+    },
+    
+    login: function (context, credentials) {      
       return new Promise((resolve, reject) => {
         axios.post('/login', {
           username: credentials.username,
@@ -152,8 +169,14 @@ export const store = new VueX.Store({
         });
       }
     },
+
+    clearTodos: function (context) {
+      context.commit('clearTodos');
+    },
     
     getTodos: function (context) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${context.state.token}`;
+      
       axios.get('/todos')
         .then(response => {
           context.commit('getTodos', response.data);

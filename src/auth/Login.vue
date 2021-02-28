@@ -4,6 +4,10 @@
       <h2>Login</h2>
 
       <form action="#" @submit.prevent="login">
+        <div class="server-error" v-if="error">
+          {{ error }}
+        </div>
+        
         <div class="form-control">
           <label for="email">Username/Email</label>
           <input type="email" name="username" id="username" class="login-input" v-model="username">
@@ -15,7 +19,11 @@
         </div>
 
         <div class="form-control">
-          <button type="submit" class="btn-submit">Login</button>
+          <button type="submit" class="btn-submit" :disabled="loading">
+            <Loader v-if="loading" />
+            
+            <span v-else>Login</span>
+          </button>
         </div>
       </form>
     </div>
@@ -23,25 +31,41 @@
 </template>
 
 <script>
+import Loader from '../components/Loader.vue';
+
 export default {
   name: 'Login',
+
+  components: { 
+    Loader
+  },
 
   data: function () {
     return {
       username: '',
       password: '',
+
+      error: '',
+      loading: false,
     };
   },
 
   methods: {
     login: function () {
+      this.loading = true;
       this.$store.dispatch('login', {
         username: this.username,
         password: this.password,
       })
         .then(() => {
+          this.loading = false;
           this.$router.push({ name: 'Todo' });
         })
+        .catch(error => {
+          this.loading = false;
+          this.error = error.response.data;
+          this.password = '';
+        });
     },
   },
 }
@@ -91,7 +115,17 @@ h2 {
 
     font-size: 16px;
     font-weight: bold;
+    transition: .2s ease-out;
     cursor: pointer;
+
+    &:hover {
+      background: darken(lightgreen, 5%);
+    }
+
+    &:disabled {
+      background: lighten(lightgreen, 5%);
+      cursor: not-allowed;
+    }
   }
 }
 </style>

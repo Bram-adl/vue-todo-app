@@ -4,6 +4,12 @@
       <h2>Register</h2>
 
       <form action="#" @submit.prevent="register">
+        <div class="server-error" v-if="error">
+          <div v-for="(err, key) in error" :key="key">
+            {{ err[0] }}
+          </div>
+        </div>
+        
         <div class="form-control">
           <label for="name">Name</label>
           <input type="name" name="name" id="name" class="login-input" v-model="name">
@@ -36,6 +42,8 @@ export default {
       name: '',
       email: '',
       password: '',
+
+      error: '',
     };
   },
 
@@ -48,6 +56,9 @@ export default {
       })
         .then(() => {
           this.$router.push({ name: 'Login' });
+        })
+        .catch(error => {
+          this.error = Object.values(error.response.data.errors);
         });
     },
   },
