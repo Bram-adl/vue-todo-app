@@ -62,11 +62,11 @@ export default {
     };
   },
 
-  computed: {
-    remaining: function () {
-      return this.$store.getters.remaining;
-    },
+  created: function () {
+    this.$store.dispatch('getTodos');
+  },
 
+  computed: {
     anyRemaining: function () {
       return this.$store.getters.anyRemaining;
     },
@@ -74,15 +74,10 @@ export default {
     todosFiltered: function () {
       return this.$store.getters.todosFiltered;
     },
-
-    showClearCompletedButton: function () {
-      return this.$store.getters.showClearCompletedButton;
-    },
   },
 
   methods: {
     addTodo: function () {
-      // Prevent user for inserting empty todo
       if (!this.newTodo.trim().length) return;
       
       this.$store.dispatch('addTodo', {

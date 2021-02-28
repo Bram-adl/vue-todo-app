@@ -117,8 +117,7 @@ export default {
     handlePluralize: function () {
       this.title = this.title + 's';
 
-      const index = this.$store.state.todos.findIndex(todo => todo.id === this.id);
-      this.$store.state.todos.splice(index, 1, {
+      this.$store.dispatch('finishEditTodo', {
         id: this.id,
         title: this.title,
         completed: this.completed,
