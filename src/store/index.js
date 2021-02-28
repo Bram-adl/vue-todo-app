@@ -8,12 +8,18 @@ Vue.use(VueX);
 
 export const store = new VueX.Store({
   state: {
+    token: localStorage.getItem('access_token') || null,
+
     filter: 'all',
 
     todos: [],
   },
 
   getters: {
+    isLoggedIn: function (state) {
+      return state.token !== null;
+    },
+    
     remaining: function (state) {
       return state.todos.filter(todo => !todo.completed).length;
     },
@@ -38,6 +44,14 @@ export const store = new VueX.Store({
   },
 
   mutations: {
+    login: function (state, token) {
+      state.token = token;
+    },
+
+    logout: function (state) {
+      state.token = null;
+    },
+    
     getTodos: function (state, todos) {
       state.todos = todos;
     },
@@ -82,6 +96,63 @@ export const store = new VueX.Store({
   },
 
   actions: {
+    login: function (context, credentials) {
+      return new Promise((resolve, reject) => {
+        axios.post('/login', {
+          username: credentials.username,
+          password: credentials.password,
+        })
+          .then(response => {
+            const token = response.data.access_token;
+  
+            localStorage.setItem('access_token', token);
+            context.commit('login', token);
+            resolve(response);
+          })
+          .catch(error => {
+            console.log(error);
+            reject(error);
+          });
+      });
+    },
+
+    register: function (context, credentials) {
+      return new Promise((resolve, reject) => {
+        axios.post('/register', {
+          name: credentials.name,
+          email: credentials.email,
+          password: credentials.password,
+        })
+          .then(response => {
+            resolve(response);
+          })
+          .catch(error => {
+            console.log(error);
+            reject(error);
+          })
+      });
+    },
+
+    logout: function (context) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${context.state.token}`;
+      
+      if (context.getters.isLoggedIn) {
+        return new Promise((resolve, reject) => {
+          axios.post('/logout')
+            .then(response => {
+              localStorage.removeItem('access_token');
+              context.commit('logout');
+              resolve(response);
+            })
+            .catch(error => {
+              localStorage.removeItem('access_token');
+              context.commit('logout');
+              reject(error);
+            });
+        });
+      }
+    },
+    
     getTodos: function (context) {
       axios.get('/todos')
         .then(response => {

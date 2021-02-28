@@ -1,8 +1,9 @@
 import Vue from 'vue';
+import VueRouter from 'vue-router';
 import Master from './layouts/Master.vue';
 
 import { store } from './store';
-import { router } from './router';
+import { routes } from './router';
 
 import 'animate.css';
 
@@ -13,6 +14,38 @@ Vue.directive('focus', {
   inserted: function (el) {
     el.focus();
   }
+});
+
+const router = new VueRouter({
+	mode: 'history',
+	routes,
+});
+
+router.beforeEach((to, from, next) => {
+	if (to.matched.some(record => record.meta.requiresAuth)) {
+		// this route requires auth, check if logged in
+		// if not, redirect to login page.
+		if (!store.getters.isLoggedIn ) {
+			next({
+				name: 'Login',
+				query: { redirect: to.fullPath },
+			});
+		} else {
+			next();
+		}
+	} else if (to.matched.some(record => record.meta.requiresVisitor)) {
+    // this route requires visitors, check if logged in
+    // if not, redirect to todo page.
+    if (store.getters.isLoggedIn) {
+      next({
+        name: 'Todo',
+      });
+    } else {
+      next();
+    }
+  } else {
+		next();
+	}
 });
 
 new Vue({

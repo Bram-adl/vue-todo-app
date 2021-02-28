@@ -2,10 +2,20 @@
   <div id="app">
     <ul class="nav">
         <li><router-link :to="{ name: 'Home' }">Home</router-link></li>
-        <li><router-link :to="{ name: 'Todo' }">Todo</router-link></li>
+        
+        <template v-if="isLoggedIn">
+          <li><router-link :to="{ name: 'Todo' }">Todo</router-link></li>
+        </template>
+
         <li><router-link :to="{ name: 'About' }">About</router-link></li>
-        <li><router-link :to="{ name: 'Login' }">Login</router-link></li>
-        <li><router-link :to="{ name: 'Register' }">Register</router-link></li>
+
+        <template v-if="!isLoggedIn">
+          <li><router-link :to="{ name: 'Login' }">Login</router-link></li>
+          <li><router-link :to="{ name: 'Register' }">Register</router-link></li>
+        </template>
+        <template v-else>
+          <li><router-link :to="{ name: 'Logout' }">Logout</router-link></li>
+        </template>
     </ul>
 
     <div>
@@ -16,7 +26,13 @@
 
 <script>
 export default {
+  name: 'Master',
 
+  computed: {
+    isLoggedIn: function () {
+      return this.$store.getters.isLoggedIn;
+    },
+  }
 }
 </script>
 
